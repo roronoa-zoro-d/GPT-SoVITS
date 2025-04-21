@@ -11,6 +11,8 @@ import platform
 import psutil
 import signal
 torch.manual_seed(233333)
+
+# 删除jieba.cache以外的文件
 tmp = os.path.join(now_dir, "TEMP")
 os.makedirs(tmp, exist_ok=True)
 os.environ["TEMP"] = tmp
@@ -26,25 +28,30 @@ if(os.path.exists(tmp)):
             pass
 import site
 import traceback
-site_packages_roots = []
-for path in site.getsitepackages():
-    if "packages" in path:
-        site_packages_roots.append(path)
-if(site_packages_roots==[]):site_packages_roots=["%s/runtime/Lib/site-packages" % now_dir]
-#os.environ["OPENBLAS_NUM_THREADS"] = "4"
-os.environ["no_proxy"] = "localhost, 127.0.0.1, ::1"
-os.environ["all_proxy"] = ""
-for site_packages_root in site_packages_roots:
-    if os.path.exists(site_packages_root):
-        try:
-            with open("%s/users.pth" % (site_packages_root), "w") as f:
-                f.write(
-                    "%s\n%s/tools\n%s/tools/asr\n%s/GPT_SoVITS\n%s/tools/uvr5"
-                    % (now_dir, now_dir, now_dir, now_dir, now_dir)
-                )
-            break
-        except PermissionError as e:
-            traceback.print_exc()
+# 模块导入： site-packages 目录下的 users.pth，每行对应一个搜索目录，python会自动将此导入到sys.path中
+# site_packages_roots = []
+# for path in site.getsitepackages():
+#     if "packages" in path:
+#         site_packages_roots.append(path)
+# if(site_packages_roots==[]):site_packages_roots=["%s/runtime/Lib/site-packages" % now_dir]
+# #os.environ["OPENBLAS_NUM_THREADS"] = "4"
+# os.environ["no_proxy"] = "localhost, 127.0.0.1, ::1"
+# os.environ["all_proxy"] = ""
+# for site_packages_root in site_packages_roots:
+#     if os.path.exists(site_packages_root):
+#         try:
+#             with open("%s/users.pth" % (site_packages_root), "w") as f:
+#                 f.write(
+#                     "%s\n%s/tools\n%s/tools/asr\n%s/GPT_SoVITS\n%s/tools/uvr5"
+#                     % (now_dir, now_dir, now_dir, now_dir, now_dir)
+#                 )
+#             break
+#         except PermissionError as e:
+#             traceback.print_exc()
+            
+for sub_dir in ["tools", "tools/asr", "GPT_SoVITS", "tools/uvr5"]:
+    sys.path.append(f"{now_dir}/{sub_dir}")       
+            
 from tools import my_utils
 import shutil
 import pdb
